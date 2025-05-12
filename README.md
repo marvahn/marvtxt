@@ -1,75 +1,98 @@
 # marvtxt
 
-public class AuthenticationModule : IHttpModule
-{
-    public void Init(HttpApplication context)
-    {
-        context.BeginRequest += async (sender, e) =>
-        {
-            var request = context.Request;
-            string token = GetAccessToken();
-            if (!string.IsNullOrEmpty(token))
-            {
-                request.Headers["Authorization"] = "Bearer " + token;
-            }
-        };
 
-        context.EndRequest += async (sender, e) =>
-        {
-            var response = context.Response;
-            if (response.StatusCode == 401) // 인증 실패(토큰 만료)
-            {
-                bool tokenRefreshed = await TryRefreshTokenAsync();
-                if (tokenRefreshed)
-                {
-                    context.Request.Headers["Authorization"] = "Bearer " + GetAccessToken();
+class XmlHttpRequestWrapperForCustom {
+    constructor() {
+        this._xhr = new XMLHttpRequest();
+        this._isRetry = false;
+
+        // 응답 처리
+        this._xhr.addEventListener('load', async () => {
+            if (this._xhr.status === 401 && !this._isRetry) {
+                console.warn('[Wrapper] 401 received, attempting token refresh...');
+                this._isRetry = true;
+
+                try {
+                    await this.refreshToken(); // 비동기 토큰 갱신
+                    const newToken = await this.getToken();
+                    //this._xhr = new XMLHttpRequest(); // 새로 객체 생성
+                    //this._isRetry = false;
+                    await this.retryRequest()
+
+                    console.warn('[Wrapper] Ready for retry, please resend manually.');
+                    // 또는 자동으로 open/send 정보를 저장하고 재호출해도 됨
+                } catch (err) {
+                    console.error('[Wrapper] Token refresh failed:', err);
                 }
             }
-        };
+        });
     }
 
-    private string GetAccessToken()
-    {
-        return HttpContext.Current.Session["accessToken"] as string ?? string.Empty;
+    getXhr() {
+        return this._xhr;
     }
 
-    private string GetRefreshToken()
-    {
-        return HttpContext.Current.Session["refreshToken"] as string ?? string.Empty;
+    open(method, url, async = true, user = null, password = null) {
+        console.log('[CustomXHR] open:', method, url);
+
+        this._method = method;
+        this._url = url;
+        return this._xhr.open(method, url, async, user, password);
     }
 
-    private async Task<bool> TryRefreshTokenAsync()
-    {
-        string refreshToken = GetRefreshToken();
-        if (string.IsNullOrEmpty(refreshToken))
-        {
-            return false;
+    send(body = null) {
+        console.log('[CustomXHR] send:', body);
+        this._body = body;
+        return this._xhr.send(body);
+    }
+
+    setRequestHeader(header, value) {
+        return this._xhr.setRequestHeader(header, value);
+    }
+
+    async retryRequest() {
+        if (!this._method || !this._url) {
+            console.error('[Wrapper] Missing previous request data.');
+            return;
         }
 
-        using (HttpClient client = new HttpClient())
-        {
-            var request = new HttpRequestMessage(HttpMethod.Post, "https://your-api.com/token/refresh")
-            {
-                Content = new StringContent($"{{\"refreshToken\": \"{refreshToken}\"}}", Encoding.UTF8, "application/json")
-            };
-            var response = await client.SendAsync(request);
-            if (response.IsSuccessStatusCode)
-            {
-                var jsonResponse = await response.Content.ReadAsStringAsync();
-                var tokenData = JsonConvert.DeserializeObject<TokenResponse>(jsonResponse);
-                HttpContext.Current.Session["accessToken"] = tokenData.AccessToken;
-                HttpContext.Current.Session["refreshToken"] = tokenData.RefreshToken;
-                return true;
-            }
-        }
-        return false;
+        this._xhr = new XMLHttpRequest();
+        await this.prepare(); // 토큰을 갱신 후 설정
+
+        this.open(this._method, this._url);
+        this.send(this._body ?? null);
     }
 
-    public void Dispose() { }
-}
+    async refreshToken() {
+        //try {
+        //    const response = await fetch('/refresh-token', { method: 'POST' });
+        //    if (!response.ok) {
+        //        throw new Error('Token refresh failed');
+        //    }
+        //    return response.json(); // 갱신된 토큰 반환
+        //} catch (err) {
+        //    console.error('[Wrapper] Token refresh failed:', err);
+        //}
 
-public class TokenResponse
-{
-    public string AccessToken { get; set; }
-    public string RefreshToken { get; set; }
+        return "refreshAccessToken";
+    }
+
+    async getToken() {
+        //try {
+        //    const response = await fetch('/get-token', { method: 'GET' });
+        //    if (!response.ok) {
+        //        throw new Error('Failed to fetch token');
+        //    }
+        //    return response.json(); // 토큰 반환
+        //} catch (err) {
+        //    console.error('[Wrapper] Failed to get token:', err);
+        //}
+
+        return "11";
+    }
+
+    async prepare() {
+        const token = await this.getToken();
+        this._xhr.setRequestHeader('Authorization', "Bearer " + token);
+    }
 }
