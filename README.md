@@ -96,3 +96,43 @@ class XmlHttpRequestWrapperForCustom {
         this._xhr.setRequestHeader('Authorization', "Bearer " + token);
     }
 }
+
+
+
+
+---------------------------------------------------------------------------------------
+
+test.ashx
+
+using System.IO;
+
+public void ProcessRequest(HttpContext context)
+{
+    context.Response.ContentType = "application/json";
+
+    if (context.Request.HttpMethod == "POST")
+    {
+        using (StreamReader reader = new StreamReader(context.Request.InputStream))
+        {
+            string requestBody = reader.ReadToEnd();
+            context.Response.Write("{ \"received\": " + requestBody + " }");
+        }
+    }
+    else
+    {
+        string name = context.Request.QueryString["name"] ?? "Guest";
+        context.Response.Write("{ \"message\": \"Hello, " + name + "!\" }");
+    }
+}
+
+---------------------------------------------------------------------------------------
+
+
+fetch("/MyHandler.ashx?name=Taehyeon", {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ name: "Taehyeon" })
+})
+.then(response => response.json())
+.then(data => console.log("Response:", data))
+.catch(error => console.error("Error:", error));
