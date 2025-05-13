@@ -136,3 +136,33 @@ fetch("/MyHandler.ashx?name=Taehyeon", {
 .then(response => response.json())
 .then(data => console.log("Response:", data))
 .catch(error => console.error("Error:", error));
+
+---------------------------------------------------------------------------------------------
+
+위에는 안되고 밑에는 되고 차이가뭔지
+try {
+    const response = fetch('/CoviWeb/approval/rms/services/GetAccessToken.ashx', { method: 'POST' });
+    if (!response.ok) {
+        throw new Error('Token refresh failed');
+    }
+    return response.json(); // 갱신된 토큰 반환
+} catch (err) {
+    console.error('[Wrapper] Token refresh failed:', err);
+}
+
+
+//$.ajax({
+//    url: "/CoviWeb/approval/rms/services/GetAccessToken.ashx",
+//    type: "POST",
+//    dataType: "json",
+//    data: null,
+//    async: false, //동기 방식으로 진행함
+//    error: function (error) {
+//        alert('데이터 조회에 실패하였습니다. 다시 시도해 주세요.');
+//    }
+//})
+//    .done(function (response) {
+//        debugger;
+//        console.log(response);
+//        alert(11);
+//    });
