@@ -166,3 +166,10 @@ try {
 //        console.log(response);
 //        alert(11);
 //    });
+
+
+-------------------------------------------------------------------------------
+json dictionary<string,object> 인데 어떻게 접근해야 나오는지
+ Dictionary<string, object> datas = Newtonsoft.Json.JsonConvert.DeserializeObject<Dictionary<string, object>>(responseText);
+ 
+{[oauth_token, {{  "expires_in": 3600,  "token_type": "JWT",  "refresh_token": "606e0955-96ca-46ce-93b4-da9c8d4d1efd",  "access_token": "eyJhbGciOiJSUzI1NiJ9.eyJpc3MiOiJlZm9ybXNpZ24uaWFtIiwiY29udGV4dCI6eyJjbGllbnRJZCI6IjY4MDk0ZWVhMjVhZjRhNjI5ZTI4ZGU5Y2ZlYzRlYmZjIiwiY2xpZW50S2V5IjoiZTNiM2IzZTUtMGEzMS00NTE1LWE5NzEtN2M4Y2FlNDI4NzZmIiwibWFuYWdlbWVudElkIjoiMzRhYWI4MDBjMmEwNDQwNThmZDRlZjc5OGFlY2RlY2EiLCJzY29wZXMiOiJzbWFydF9lZm9ybV9zY29wZSIsInR5cGUiOiJ1c2VyIiwidXNlck5hbWUiOiJ0YWVhbkBkZWxvaXR0ZS5jb20iLCJ1c2VySWQiOiI3ZGE3NTM4MTljYmM0YTAxYjc3ZDFhN2ZjMmVjMjI0MSIsInJlZnJlc2hUb2tlbiI6IjYwNmUwOTU1LTk2Y2EtNDZjZS05M2I0LWRhOWM4ZDRkMWVmZCJ9LCJjbGFpbSI6eyJtZW1iZXJfaWQiOiJ0YWVhbkBkZWxvaXR0ZS5jb20iLCJjb21wYW55X2lkIjoiY2Q1NjU4NzkyMjQwNGU2NWFlMDMxNzhiM2EwODU3NjgiLCJhY2Nlc3Nfa2V5IjoiMDkzNzRjZTktOGI0MS00OTIwLTk3ZmYtZGZlODRkOTAzMGY5In0sImV4cCI6MTc0NzEzMDg4OSwiaWF0IjoxNzQ3MTI3Mjg5fQ.KHHdOzAB3qzFeFC7ivsaUZzdg5Yqfo2foi04hmo0IYEp2SEyTbxK1ENBPf9YTTewHA0n1QEFeFVCKlt7RZc1DODAAdKjReQGPKQqHgsFAqm-CbMObtnVjb8d_9rc1ankuvdFGYBFZKD4z51-Pe0civjCAd5F8k_Tt8e8m3JGRPI"}}]}
